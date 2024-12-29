@@ -1,0 +1,14 @@
+# ignore
+*.txt
+*.md
+*.json
+
+### DotnetCore ###
+# .NET Core build folders
+bin/
+obj/
+
+*.csproj
+
+# don't ignore README
+!README.md
