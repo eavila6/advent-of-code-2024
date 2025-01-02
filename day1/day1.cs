@@ -14,13 +14,10 @@ dotnet clean    # like clean in makefiles
 
 // base library
 using System;
-using System.Globalization;
-
 // for use with files and directories
 using System.IO;
 // for use with specialized lists
 using System.Linq;
-using System.Net.Http.Headers;
 
 // the class we're working with for this project
 class day1 {
