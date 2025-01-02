@@ -14,11 +14,38 @@ dotnet clean    # like clean in makefiles
 
 // base library
 using System;
+using System.Globalization;
+
 // for use with files and directories
 using System.IO;
+// for use with specialized lists
+using System.Linq;
+using System.Net.Http.Headers;
 
 // the class we're working with for this project
 class day1 {
+
+    // this method can generate a dictionary for any list,
+    // but for pt 2 we only want to generate a dict for the right list
+    static Dictionary<int, int> genDict(List<int> r) {
+        // generates a dictionary that creates a key of every value in the list
+        // and appends its frequency as the value of that key
+        Dictionary<int, int> rFreq = r.GroupBy(num=>num).ToDictionary(group=>group.Key, group=>group.Count());
+        return rFreq;
+    }
+
+    // this method checks each value in the left list to the keys of the right dict
+    // and mults the left elem with its frequency in the right list
+    // (this sum of mults is the answer to pt2)
+    static int simScore(List<int> l, Dictionary<int, int> r) {
+        int retval = 0;
+        foreach(int elem in l) {
+            if(r.ContainsKey(elem)) {
+                retval += elem * r[elem];
+            }
+        }
+        return retval;
+    }
     static int listSum(List<int> l, List<int> r) {
         int a, b;   // declare our two ints for math
         int retVal = 0;
@@ -131,8 +158,13 @@ class day1 {
             Environment.Exit(1);
         }
 
+        Dictionary<int, int> rdict = genDict(searchRight);
+
         int answer = listSum(searchLeft, searchRight);
-        Console.WriteLine("Our answer is " + answer);
+        Console.WriteLine("Pt.1 answer is " + answer);
+
+        int pt2a = simScore(searchLeft, rdict);
+        Console.WriteLine($"Pt.2 answer is {pt2a}");
         
         // Console.WriteLine("Hello World!"); 
         Environment.Exit(0);
