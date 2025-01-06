@@ -104,8 +104,77 @@ class day3 {
 
         int answer = domath(ops);
         Console.WriteLine("Our answer is " + answer);
+
+        // pt2 section
+        part2 mypt2 = new part2();
+        var ops2 = mypt2.fileReader(args[0]);
+        int pt2ans = domath(ops2);
+        Console.WriteLine($"pt2 answer is {pt2ans}");
         
         Console.WriteLine("Hello World!"); 
         Environment.Exit(0);
+    }
+}
+
+class part2 : day3 {
+    public List<(int, int)> fileReader(string f) {
+        // f is our filename, and here's how we can check if we can get it
+        string fil = Path.Combine(Directory.GetCurrentDirectory(), f);
+        
+        // a list to actually work with in a helper function
+        List<(int, int)> regexmatch = new List<(int, int)>();
+        // pt2 regex pattern-- adds the do & don't qualities to scan for
+        string pattern = @"mul\((\d+),(\d+)\)|do\(\)|don't\(\)";
+        // a new bool to toggle to correctly append expressions to the matches list
+        bool multOn = true;
+
+        // To read a text file line by line 
+        if (File.Exists(fil)) {
+            // Console.WriteLine("Found the file");
+            // Store each line in array of strings 
+            string[] lines = File.ReadAllLines(fil);
+            // Console.WriteLine($"size of lines is {lines.Length}");
+
+            foreach(string ln in lines) {
+                // Console.WriteLine($"ln is {ln}");
+                // generate matches foreach line
+                MatchCollection matches = Regex.Matches(ln, pattern);
+
+                foreach(Match m in matches) {
+                    // append elements to the return list
+                    /*
+                    Console.WriteLine($"matched content is {m.Value}");
+                    Console.WriteLine($"first number is {m.Groups[1].Value}");
+                    Console.WriteLine($"second number is {m.Groups[2].Value}");
+                    */;
+
+                    if(m.Value == "do()") {
+                        multOn = true;
+                    }
+                    else if (m.Value == "don't()") {
+                        multOn = false;
+                    }
+                    /* the logic for the list appending updated to this
+                    we check if we get a successful match on our groups (the numbers we want)
+                    and confirm we want to mult
+                    if this is left as an if statement it'll append all group matches
+                    and if the match successes are left out it'll append garbage that screws up the list
+                    */
+                    else if(m.Groups[1].Success && m.Groups[2].Success && multOn) {
+                        // this is the first (\d+) in the pattern -- parens denote a grouping
+                        int a = Int32.Parse(m.Groups[1].Value);
+                        // this is the second (\d+) 
+                        int b = Int32.Parse(m.Groups[2].Value);
+                        // Console.WriteLine($"biggo tuple {(a, b)}");
+                        regexmatch.Add((a, b));
+                    }
+                }
+            }
+        } else {
+            Console.WriteLine("The filename " + fil + " doesn't exist");
+            Console.WriteLine("Please recheck spelling and file location");
+        }
+
+        return regexmatch;
     }
 }
