@@ -10,11 +10,13 @@ https://adventofcode.com/2024/day/2
 using System;
 // for use with files and directories
 using System.IO;
+// for use with specialized lists
+using System.Linq;
 
 // the class we're working with for this project
 class day2 {
 
-    static bool incdec(int[] levels) {
+    public static bool incdec(int[] levels) {
         /*
         This is the helper function for checking constant
         incrementing /decrementing
@@ -55,7 +57,7 @@ class day2 {
         return true;
     }
 
-    static bool differ(int[] levels) {
+    public static bool differ(int[] levels) {
         // this was leagues easier than checking incrementing/decrementing
         int temp;   // temp val for checking
         for (int i = 0; i < levels.Length - 1; i++) {
@@ -178,6 +180,15 @@ class day2 {
 
         int answer = reportChecker(reports);
         Console.WriteLine("Our answer is " + answer);
+
+        // make a new instance of part 2 child
+        // I know this isn't the best way to organize this file
+        // there should honestly be a class Program that houses main and the file reader
+        // so that the parent + child makes more sense to read
+        // but I am too lazy to implement better practice lol :/
+        part2 mypt2 = new part2();
+        int pt2ans = mypt2.reportChecker(reports);
+        Console.WriteLine($"pt2 answer is {pt2ans}");
         
         
         Console.WriteLine("Hello World!"); 
@@ -185,3 +196,72 @@ class day2 {
     }
 }
 
+class part2 : day2 {
+
+    /* tolerate is a special method for solving the day2 subproblem
+    this method will only be relevant if both incdec & differ fail (this is the main problem)
+    */
+    static bool tolerate(int[] levels) {
+        // Console.WriteLine("got in pt2 tolerate");
+        var levellist = levels.ToList();
+
+        for (int i = 0; i < levellist.Count; i++) {
+            // create a temp copy of the level list to check if it's still safe
+            // if each ith elem is removed
+            List<int> temp = new List<int>(levellist);
+            temp.RemoveAt(i);
+
+            // if we can verify at least one instance of the level being
+            // true if we remove the i-th element, we win
+            if(incdec(temp.ToArray()) && differ(temp.ToArray())) {
+                return true;
+            }
+        }
+        // assume we fail if we can't find a solution to this subproblem
+        return false;
+    }
+
+    public int reportChecker(List<string> l) {
+        char[] delimiter = {' '};  // declare a delimiter
+        int safe = 0;
+
+        foreach(string ln in l) {
+            int ctr = 0;
+            // Console.WriteLine($"line is {ln}");
+            
+            string[] splitter = ln.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+
+            // these are what the problem calls levels
+            int[] levels = new int[splitter.Length];
+            // Console.WriteLine($"length is {splitter.Length}");
+
+            // store the parsed elements into a temporary array of ints
+            foreach(string elem in splitter) {
+                // Console.WriteLine($"elem is {elem}");
+                try {
+                    levels[ctr] = Int32.Parse(elem);
+                    
+                } catch (FormatException) {
+                    Console.WriteLine($"{elem} has bad format");
+                }
+                // Console.WriteLine($"current elem is {levels[ctr]}");
+                ctr++;
+            }
+
+            // do work here with helper functions
+            bool id = incdec(levels);   // check if all incrementing or decrementing
+            bool di = differ(levels);   // check if difference is being maintained
+            bool to = tolerate(levels);   // check if tolerance is being maintained
+
+            // our new bool check that goes into the subproblem if the main problem returns false
+            if((id && di) || to) {
+                safe++;
+            }
+            
+            // Console.WriteLine($"{ctr}");
+            // Console.WriteLine();
+        }
+
+        return safe;
+    }
+}
