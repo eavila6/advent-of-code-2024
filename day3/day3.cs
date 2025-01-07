@@ -117,6 +117,10 @@ class day3 {
 }
 
 class part2 : day3 {
+    /* today's pt2 subproblem doesn't really need much modified
+    it just needs a new filereader that parses out information slightly differently
+    this child's filereader scans for mul, do, and don't commands with a regex pattern
+    */
     public List<(int, int)> fileReader(string f) {
         // f is our filename, and here's how we can check if we can get it
         string fil = Path.Combine(Directory.GetCurrentDirectory(), f);
